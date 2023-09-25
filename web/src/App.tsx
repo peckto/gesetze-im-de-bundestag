@@ -39,14 +39,7 @@ function App() {
     .then(data => setGesetze(data))
   }, [setGesetze])
 
-  const colsed: string[] = [
-    'Zusammengeführt mit... (siehe Vorgangsablauf)',
-    'Einbringung abgelehnt',
-    'Abgelehnt',
-    'Verkündet',
-    'Zurückgezogen',
-    'Für erledigt erklärt'
-  ]
+  // all beratungsstand to display in board
   const beratungsstand = [
     'Dem Bundesrat zugeleitet - Noch nicht beraten',
     'Überwiesen',
@@ -63,13 +56,13 @@ function App() {
   ]
   const gesetzeOpen = useMemo<Gesetz[]>(() => gesetze.filter(it => beratungsstand.includes(it.beratungsstand)), [gesetze])
   const colSize = 400
-  console.log(beratungsstand)
+
   return (
     <>
     <div id='headline'>
     <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unfollständige Informationen beinhalten.</h3>
     <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a></p>
-    <p>Stand: 29.05.2023</p>
+    <p>Stand: 25.09.2023</p>
     <p>Fork me on GitHub: <a href="https://github.com/peckto/gesetze-im-de-bundestag">https://github.com/peckto/gesetze-im-de-bundestag</a></p>
     <Divider />
     </div>
