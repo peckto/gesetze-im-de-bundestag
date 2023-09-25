@@ -30,15 +30,11 @@ function GesetzCard(gesetz: Gesetz) {
   );
 }
 
-function App() {
-  const [gesetze, setGesetze] = useState<Gesetz[]>([])
+interface KanbanBoardProps {
+  gesetze: Gesetz[];
+}
 
-  useEffect(() => {
-    fetch('gesetze.json')
-    .then(response => response.json())
-    .then(data => setGesetze(data))
-  }, [setGesetze])
-
+function KanbanBoard({gesetze}: KanbanBoardProps) {
   // all beratungsstand to display in board
   const beratungsstand = [
     'Dem Bundesrat zugeleitet - Noch nicht beraten',
@@ -85,6 +81,18 @@ function App() {
     </Grid>
     </>
   )
+}
+
+function App() {
+  const [gesetze, setGesetze] = useState<Gesetz[]>([])
+
+  useEffect(() => {
+    fetch('gesetze.json')
+    .then(response => response.json())
+    .then(data => setGesetze(data))
+  }, [setGesetze])
+
+  return <KanbanBoard gesetze={gesetze}/>
 }
 
 export default App
