@@ -54,16 +54,6 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
   const colSize = 400
 
   return (
-    <>
-    <div id='headline'>
-    <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unfollständige Informationen beinhalten.</h3>
-    <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a></p>
-    <p>Stand: 25.09.2023</p>
-    <p>Fork me on GitHub: <a href="https://github.com/peckto/gesetze-im-de-bundestag">https://github.com/peckto/gesetze-im-de-bundestag</a></p>
-    <Divider />
-    </div>
-    <br />
-    
     <Grid container spacing={2} sx={{ width: colSize*12 }}>
     {
     beratungsstand.map(it => (
@@ -79,7 +69,6 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
     })
     }
     </Grid>
-    </>
   )
 }
 
@@ -92,7 +81,20 @@ function App() {
     .then(data => setGesetze(data))
   }, [setGesetze])
 
-  return <KanbanBoard gesetze={gesetze}/>
+  return (
+    <>
+    <div id='headline'>
+    <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unfollständige Informationen beinhalten.</h3>
+    <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a></p>
+    <p>Stand: 25.09.2023</p>
+    <p>Fork me on GitHub: <a href="https://github.com/peckto/gesetze-im-de-bundestag">https://github.com/peckto/gesetze-im-de-bundestag</a></p>
+    <Divider />
+    </div>
+    <br />
+    
+    <KanbanBoard gesetze={gesetze}/>
+    </>
+  )
 }
 
 export default App
