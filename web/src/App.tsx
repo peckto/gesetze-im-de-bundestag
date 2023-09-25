@@ -47,10 +47,23 @@ function App() {
     'Zurückgezogen',
     'Für erledigt erklärt'
   ]
-  const gesetzeOpen = useMemo<Gesetz[]>(() => gesetze.filter(it => !colsed.includes(it.beratungsstand)), [gesetze])
-  const beratungsstand = useMemo<string[]>(() => [... new Set(gesetzeOpen.map(it => it.beratungsstand))], [gesetzeOpen])
+  const beratungsstand = [
+    'Dem Bundesrat zugeleitet - Noch nicht beraten',
+    'Überwiesen',
+    '1. Durchgang im Bundesrat abgeschlossen',
+    'Noch nicht beraten',
+    'Beschlussempfehlung liegt vor',
+    'Dem Bundestag zugeleitet - Noch nicht beraten',
+    'Bundesrat hat Vermittlungsausschuss nicht angerufen',
+    'Bundesrat hat zugestimmt',
+    'Vermittlungsvorschlag angenommen',
+    'Verabschiedet',
+    'Angenommen',
+    'Den Ausschüssen zugewiesen'
+  ]
+  const gesetzeOpen = useMemo<Gesetz[]>(() => gesetze.filter(it => beratungsstand.includes(it.beratungsstand)), [gesetze])
   const colSize = 400
-
+  console.log(beratungsstand)
   return (
     <>
     <div id='headline'>
