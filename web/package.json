@@ -18,6 +18,9 @@
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^5.13.1",
+    "@mui/x-charts": "^6.0.0-alpha.12",
+    "@types/d3-array": "^3.0.8",
+    "d3-array": "^3.2.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
