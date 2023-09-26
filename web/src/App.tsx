@@ -9,6 +9,12 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+//import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 import FormLabel from '@mui/material/FormLabel';import { BarChart } from '@mui/x-charts';
 import * as d3 from 'd3-array'
 
@@ -88,6 +94,7 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
 function Statistics({gesetze}: KanbanBoardProps) {
   const [value, setValue] = useState('published');
   const bins = [7, 14, 30, 60, 120, 240, 365];
+  const bins_label = [...bins, '>365']
   var gesetze_filtered = undefined
   if (value === 'published') {
     gesetze_filtered = gesetze.filter(g => g.beratungsstand == 'Verkündet')
@@ -101,8 +108,8 @@ function Statistics({gesetze}: KanbanBoardProps) {
   const bin = d3.bin<Gesetz, number>().domain([0, 9999]).thresholds(bins.map(v => v+1)).value(d => d.vorgangsdauer)
   const hist_bt = bin(gesetze_bt);
   const hist_br = bin(gesetze_br);
-  console.log(hist_bt)
-  console.log(hist_br)
+  const hist = bin(gesetze_filtered);
+  console.log(hist)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -126,13 +133,13 @@ function Statistics({gesetze}: KanbanBoardProps) {
       </RadioGroup>
     </FormControl>
     <BarChart
-      width={600}
-      height={400}
+      width={700}
+      height={500}
       series={[
         { data: hist_bt.map(b => b.length), label: 'Gesetze Bundestag', id: 'bt' },
         { data: hist_br.map(b => b.length), label: 'Gesetze Bundestag+Bundesrat', id: 'br' }
       ]}
-      xAxis={[{ scaleType: 'band', data: bins, id: 'vorgang-duration', label: 'Vorgang Dauer in Tagen' }]}
+      xAxis={[{ scaleType: 'band', data: bins_label, id: 'vorgang-duration', label: 'Vorgang Dauer in Tagen' }]}
       legend={{
         direction: "column",
         position: {
@@ -142,6 +149,22 @@ function Statistics({gesetze}: KanbanBoardProps) {
       }}
     >
     </BarChart>
+    {
+      hist.map((gesetze, idx) => (
+      <Accordion key={"Accordion-"+bins[idx]}>
+        <AccordionSummary
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+          <Typography>Vorgang Dauer {bins_label[idx]} Tage</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+        {gesetze.map(g => <GesetzCard key={g.id} {...g} />)}
+        </AccordionDetails>
+      </Accordion>
+      ))
+    }
+    
     </>
   )
 }
@@ -167,6 +190,7 @@ function App() {
     <br />
     
     <Statistics gesetze={gesetze}/>
+    <Divider sx={{ m: 10 }} />
     <KanbanBoard gesetze={gesetze}/>
     </>
   )
