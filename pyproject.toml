@@ -8,8 +8,9 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 jupyterlab = "^4.0.0"
-polars = "^0.17.14"
+polars = "^0.19.00"
 matplotlib = "^3.7.1"
+pyarrow = "^13.0.0"
 
 
 [build-system]
