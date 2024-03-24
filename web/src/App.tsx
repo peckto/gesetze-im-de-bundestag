@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
 
 import FormLabel from '@mui/material/FormLabel';import { BarChart } from '@mui/x-charts';
 import * as d3 from 'd3-array'
@@ -133,7 +134,7 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
 
   return (
     <>
-    <h2>Kanban Board Gesetzesvorhaben</h2>
+    <h2>Kanban Board - Gesetzesvorhaben</h2>
     <Paper>
     <Grid container spacing={2}>
       <Grid xs={1}>
@@ -150,11 +151,11 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
       </Grid>
     </Grid>
     </Paper>
-
+    <Box sx={{ m: 1 }} />
     <Grid container spacing={2} sx={{ width: colSize*12 }}>
     {
     beratungsstand_runnng.map(it => (
-      <Grid sx={{ width: colSize }} xs={1} key={it}>{it}</Grid>
+      <Grid sx={{ width: colSize }} xs={1} key={it}><b>{it}</b></Grid>
     ))
     }
     {
@@ -262,7 +263,7 @@ function App() {
     <h1>Überblick zu Gesetzesvorhaben der Deutschen Bundesregierung in der 20. Wahlperiode</h1>
     <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unfollständige Informationen beinhalten.</h3>
     <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a></p>
-    <p>Stand: 25.09.2023</p>
+    <p>Stand: 24.03.2024</p>
     <p>Fork me on GitHub: <a href="https://github.com/peckto/gesetze-im-de-bundestag">https://github.com/peckto/gesetze-im-de-bundestag</a></p>
     <Divider />
     </div>

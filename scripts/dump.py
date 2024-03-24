@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import requests
+import time
 
 
 def dump(url: str, args: dict[str, str]):
@@ -11,6 +12,7 @@ def dump(url: str, args: dict[str, str]):
         if cursor:
             args['cursor'] = cursor
         res = requests.get(url, params=args)
+        assert res.status_code == 200, f'Unexpected status code: {res}'
         j = res.json()
         if j['numFound'] == 0:
             print('No documents found')
@@ -19,7 +21,9 @@ def dump(url: str, args: dict[str, str]):
         last_cursor = cursor
         cursor = j['cursor']
         data += j['documents']
-    
+        # rate limit
+        time.sleep(0.3)
+    time.sleep(0.3)
     return data
 
 
