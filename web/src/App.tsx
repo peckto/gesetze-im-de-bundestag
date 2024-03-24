@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, Dispatch } from 'react'
 import Grid from '@mui/material/Unstable_Grid2';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -13,10 +13,64 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
-//import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
+import Paper from '@mui/material/Paper';
 
 import FormLabel from '@mui/material/FormLabel';import { BarChart } from '@mui/x-charts';
 import * as d3 from 'd3-array'
+
+interface FilterSachgebietProps {
+  gesetzeOpen: Gesetz[];
+  setGesetzeView: Dispatch<Gesetz[]>;
+  setState: Dispatch<boolean>;
+}
+
+function FilterSachgebiet(props: FilterSachgebietProps) {
+  const [val, setVal_] = useState<string[]>([]);
+
+  function setVal(newValue: string[]) {
+    setVal_(newValue);
+    props.setState(newValue.length > 0);
+    const gesetzeFiltered = props.gesetzeOpen.filter((it) => it.sachgebiet?.some((s) => newValue.includes(s)));
+    props.setGesetzeView(gesetzeFiltered.length > 0 ? gesetzeFiltered : props.gesetzeOpen);
+  }
+
+  const sachgebiete: string[] = [... d3.sort(new Set(props.gesetzeOpen.flatMap((it) => it.sachgebiet || [])))];
+
+  return (
+    <div>
+      <Autocomplete
+        multiple
+        id="tags-standard"
+        freeSolo={false}
+        filterSelectedOptions
+        options={sachgebiete}
+        onChange={(_, newValue) => {
+          setVal(newValue);
+        }}
+        renderTags={(options) =>
+          options.map((option) => {
+            return (
+              <Chip
+                key={option}
+                label={option}
+                onDelete={() => {
+                  setVal(val.filter((entry) => entry !== option));
+                }}
+              />
+            );
+          })
+        }
+        isOptionEqualToValue={(option, value) => option === value}
+        value={val}
+        renderInput={(params) => (
+          <TextField {...params} variant="standard" placeholder="Sachgebiet" margin="normal" fullWidth />
+        )}
+      />
+    </div>
+  );
+}
 
 
 interface Gesetz {
@@ -67,21 +121,46 @@ const beratungsstand_runnng = [
 
 function KanbanBoard({gesetze}: KanbanBoardProps) {
   const gesetzeOpen = useMemo<Gesetz[]>(() => gesetze.filter(it => beratungsstand_runnng.includes(it.beratungsstand)), [gesetze])
+  const [gesetzeFilterSachgebiet, setGesetzeFilterSachebiet] = useState<Gesetz[]>([])
+  const [gesetzeFilterTitle, setGesetzeFilterTitle] = useState<Gesetz[]>([])
+  const [filterTitleActive, setFilterTitleActive] = useState<boolean>(false);
+  const [filterSachgebietActive, setFilterSachgebietActive] = useState<boolean>(false);
+
+  const gesetzeViewSachgebiet = useMemo<Gesetz[]>(() => filterSachgebietActive ? gesetzeFilterSachgebiet : gesetzeOpen, [filterSachgebietActive, gesetzeFilterSachgebiet, gesetzeOpen]);
+  const gesetzeViewTitle = useMemo<Gesetz[]>(() => filterTitleActive ? gesetzeFilterTitle : gesetzeViewSachgebiet, [filterTitleActive, gesetzeFilterTitle, gesetzeViewSachgebiet]);
+
   const colSize = 400
 
   return (
     <>
-    <h2>Kanban Board</h2>
+    <h2>Kanban Board Gesetzesvorhaben</h2>
+    <Paper>
+    <Grid container spacing={2}>
+      <Grid xs={1}>
+        Filter
+      </Grid>
+      <Grid xs={7}>
+        <FilterSachgebiet gesetzeOpen={gesetzeOpen} setGesetzeView={setGesetzeFilterSachebiet} setState={setFilterSachgebietActive} />
+      </Grid>
+      <Grid xs={4}>
+        <TextField id="standard-basic" label="Title" variant="standard" onChange={(e) => {
+          setFilterTitleActive(e.target.value.length > 0)
+          setGesetzeFilterTitle(gesetzeViewTitle.filter((it) => it.titel.indexOf(e.target.value) > 0))
+          }} />
+      </Grid>
+    </Grid>
+    </Paper>
+
     <Grid container spacing={2} sx={{ width: colSize*12 }}>
     {
     beratungsstand_runnng.map(it => (
-      <Grid sx={{ width: colSize }} xs={1}>{it}</Grid>
+      <Grid sx={{ width: colSize }} xs={1} key={it}>{it}</Grid>
     ))
     }
     {
     beratungsstand_runnng.map(it => {
-      const data = gesetzeOpen.filter(g => g.beratungsstand === it)
-      return <Grid sx={{ width: colSize }} xs={1}>
+      const data = gesetzeViewTitle.filter(g => g.beratungsstand === it)
+      return <Grid sx={{ width: colSize }} xs={1} key={it}>
         {data.map(g => <GesetzCard key={g.id} {...g} />)}
         </Grid>
     })
@@ -109,7 +188,6 @@ function Statistics({gesetze}: KanbanBoardProps) {
   const hist_bt = bin(gesetze_bt);
   const hist_br = bin(gesetze_br);
   const hist = bin(gesetze_filtered);
-  console.log(hist)
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -181,6 +259,7 @@ function App() {
   return (
     <>
     <div id='headline'>
+    <h1>Überblick zu Gesetzesvorhaben der Deutschen Bundesregierung in der 20. Wahlperiode</h1>
     <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unfollständige Informationen beinhalten.</h3>
     <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a></p>
     <p>Stand: 25.09.2023</p>
