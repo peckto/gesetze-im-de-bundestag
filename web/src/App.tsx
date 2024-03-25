@@ -139,40 +139,43 @@ function KanbanBoard({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
 
   const [gesetzeView, setGesetzeView] = useState<Gesetz[]>([])
 
-  const applyFilter = () => {
+  const applyFilter = (sachegebiete: string[], initiators: string[], title: string, sachgebietActive: boolean, initiatorsActive: boolean, titleActive: boolean) => {
     var gesetze = gesetzeOpen;
-    if (filterTitleActive) {
-      gesetze = gesetze.filter((it) => it.titel.indexOf(gesetzeFilterTitle) > 0);
+    if (titleActive) {
+      gesetze = gesetze.filter((it) => it.titel.indexOf(title) >= 0);
     }
-    if (filterSachgebietActive) {
-      gesetze = gesetze.filter((it) => it.sachgebiet?.some((s) => gesetzeFilterSachgebiet.includes(s)))
+    if (sachgebietActive) {
+      gesetze = gesetze.filter((it) => it.sachgebiet?.some((s) => sachegebiete.includes(s)))
     }
-    if (filterInitiativeActive) {
-      gesetze = gesetze.filter((it) => it.initiative?.some((s) => gesetzeFilterInitiative.includes(s)))
+    if (initiatorsActive) {
+      gesetze = gesetze.filter((it) => it.initiative?.some((s) => initiators.includes(s)))
     }
     setGesetzeView(gesetze)
   }
 
-  useEffect(() => applyFilter())
+  useEffect(() => {gesetzeView.length === 0 && applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, filterSachgebietActive, filterInitiativeActive, filterTitleActive)})
 
   const colSize = 400;
 
-  const handleFilterSachgebiet = (gesetze: string[]) => {
-    setFilterSachgebietActive(gesetze.length > 0);
-    setGesetzeFilterSachgebiet(gesetze)
-    applyFilter()
+  const handleFilterSachgebiet = (sachgebiete: string[]) => {
+    const sachgebietActive: boolean = sachgebiete.length > 0;
+    setFilterSachgebietActive(sachgebietActive);
+    setGesetzeFilterSachgebiet(sachgebiete)
+    applyFilter(sachgebiete, gesetzeFilterInitiative, gesetzeFilterTitle, sachgebietActive, filterInitiativeActive, filterTitleActive)
   }
 
   const handleFilterTitle = (title: string) => {
-    setFilterTitleActive(title.length > 0)
+    const titleActive: boolean = title.length > 0;
+    setFilterTitleActive(titleActive)
     setGesetzeFilterTitle(title)
-    applyFilter()
+    applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, title, filterSachgebietActive, filterInitiativeActive, titleActive)
   }
 
-  const handleFilterInitiative = (gesetze: string[]) => {
-    setFilterInitiativeActive(gesetze.length > 0);
-    setGesetzeFilterInitiative(gesetze)
-    applyFilter()
+  const handleFilterInitiative = (initiators: string[]) => {
+    const initiatorsActive: boolean = initiators.length > 0
+    setFilterInitiativeActive(initiatorsActive);
+    setGesetzeFilterInitiative(initiators)
+    applyFilter(gesetzeFilterSachgebiet, initiators, gesetzeFilterTitle, filterSachgebietActive, initiatorsActive, filterTitleActive)
   }
 
   return (
