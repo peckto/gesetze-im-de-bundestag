@@ -222,6 +222,10 @@ function Statistics({gesetze, initiators}: KanbanBoardProps) {
       return gesetze.filter(g => g.beratungsstand == 'Verkündet')
     } else if (value === 'running') {
       return gesetze.filter(it => beratungsstand_runnng.includes(it.beratungsstand))
+    } else if (value === 'rejected') {
+      return gesetze.filter(it => it.beratungsstand === 'Abgelehnt')
+    } else if (value === 'incompatible') {
+      return gesetze.filter(it => it.beratungsstand === 'Für mit dem Grundgesetz unvereinbar erklärt')
     }
     return gesetze
   }, [value, gesetze])
@@ -254,6 +258,8 @@ function Statistics({gesetze, initiators}: KanbanBoardProps) {
         <FormControlLabel value="published" control={<Radio />} label="Veröffentlicht" />
         <FormControlLabel value="all" control={<Radio />} label="Alle" />
         <FormControlLabel value="running" control={<Radio />} label="Offen" />
+        <FormControlLabel value="rejected" control={<Radio />} label="Abgelehnt" />
+        <FormControlLabel value="incompatible" control={<Radio />} label="Unvereinbar mit Grundgesetz" />
       </RadioGroup>
     </FormControl>
 
