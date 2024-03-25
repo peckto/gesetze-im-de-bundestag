@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import Grid from '@mui/material/Unstable_Grid2';
+import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
@@ -17,6 +17,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 import FormLabel from '@mui/material/FormLabel';
 import { BarChart } from '@mui/x-charts';
@@ -179,16 +180,16 @@ function KanbanBoard({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
     <h2>Kanban Board - Offene Gesetzesvorhaben</h2>
     <Paper>
     <Grid container spacing={2}>
-      <Grid xs={1}>
+      <Grid item={true} xs={1}>
         Filter
       </Grid>
-      <Grid xs={4}>
+      <Grid item={true} xs={4}>
         <FilterWidget options={sachgebiete} callback={handleFilterSachgebiet} placeholder='Sachgebiet' />
       </Grid>
-      <Grid xs={3}>
+      <Grid item={true} xs={3}>
         <FilterWidget options={initiators} callback={handleFilterInitiative} placeholder='Initiator' />
       </Grid>
-      <Grid xs={4}>
+      <Grid item={true} xs={4}>
         <TextField id="standard-basic" label="Title" variant="standard" onChange={(e) => {handleFilterTitle(e.target.value)}} />
       </Grid>
     </Grid>
@@ -197,13 +198,13 @@ function KanbanBoard({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
     <Grid container spacing={2} sx={{ width: colSize*12 }}>
     {
     beratungsstand_runnng.map(it => (
-      <Grid sx={{ width: colSize }} xs={1} key={it}><b>{it}</b></Grid>
+      <Grid sx={{ width: colSize }} item={true} xs={1} key={it}><b>{it} ({gesetzeView.filter(g => g.beratungsstand === it).length})</b></Grid>
     ))
     }
     {
     beratungsstand_runnng.map(it => {
       const data = gesetzeView.filter(g => g.beratungsstand === it)
-      return <Grid sx={{ width: colSize }} xs={1} key={it}>
+      return <Grid sx={{ width: colSize }} item={true} xs={1} key={it}>
         {data.map(g => <GesetzCard key={g.id} {...g} />)}
         </Grid>
     })
@@ -272,13 +273,7 @@ function Statistics({gesetze, initiators}: KanbanBoardProps) {
         { data: hist_br.map(b => b.length), label: 'Gesetze Bundestag+Bundesrat', id: 'br' }
       ]}
       xAxis={[{ scaleType: 'band', data: bins_label, id: 'vorgang-duration', label: 'Vorgang Dauer in Tagen' }]}
-      legend={{
-        direction: "column",
-        position: {
-          vertical: "top",
-          horizontal: "middle"
-        }
-      }}
+
     />
 
     <h3>Gesetzesvorhaben nach Vorgangsdauer</h3>
@@ -286,10 +281,11 @@ function Statistics({gesetze, initiators}: KanbanBoardProps) {
       hist.map((gesetze, idx) => (
       <Accordion key={"Accordion-"+bins[idx]}>
         <AccordionSummary
+          expandIcon={<ArrowDropDownIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography>Vorgang Dauer {bins_label[idx]} Tage</Typography>
+          <Typography>Vorgang Dauer {bins_label[idx]} Tage ({gesetze.length})</Typography>
         </AccordionSummary>
         <AccordionDetails>
         {gesetze.map(g => <GesetzCard key={g.id} {...g} />)}
@@ -303,18 +299,12 @@ function Statistics({gesetze, initiators}: KanbanBoardProps) {
       Object.keys(initiator_hist).length > 0 && <BarChart
       width={900}
       height={600}
-      margin={{ top: 5, right: 30, left: 250, bottom: 20 }}
+      margin={{ top: 50, right: 30, left: 250, bottom: 20 }}
       series={[
         { data: Object.values(initiator_hist), label: 'Initiator', id: 'bt' },
       ]}
       yAxis={[{ scaleType: 'band', data: Object.keys(initiator_hist), id: 'anzahl-gesetze' }]}
-      legend={{
-        direction: "column",
-        position: {
-          vertical: "top",
-          horizontal: "middle"
-        }
-      }}
+
       layout="horizontal"
     />
   }
