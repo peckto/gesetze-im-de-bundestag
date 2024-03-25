@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, Dispatch } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Grid from '@mui/material/Unstable_Grid2';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -18,26 +18,25 @@ import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 
-import FormLabel from '@mui/material/FormLabel';import { BarChart } from '@mui/x-charts';
+import FormLabel from '@mui/material/FormLabel';
+import { BarChart } from '@mui/x-charts';
 import * as d3 from 'd3-array'
 
-interface FilterSachgebietProps {
-  gesetzeOpen: Gesetz[];
-  setGesetzeView: Dispatch<Gesetz[]>;
-  setState: Dispatch<boolean>;
+type filterCallbackType = (a: string[]) => void;
+
+interface FilterWidgetProps {
+  callback: filterCallbackType;
+  options: string[];
+  placeholder: string;
 }
 
-function FilterSachgebiet(props: FilterSachgebietProps) {
+function FilterWidget(props: FilterWidgetProps) {
   const [val, setVal_] = useState<string[]>([]);
 
   function setVal(newValue: string[]) {
     setVal_(newValue);
-    props.setState(newValue.length > 0);
-    const gesetzeFiltered = props.gesetzeOpen.filter((it) => it.sachgebiet?.some((s) => newValue.includes(s)));
-    props.setGesetzeView(gesetzeFiltered.length > 0 ? gesetzeFiltered : props.gesetzeOpen);
+    props.callback(newValue);
   }
-
-  const sachgebiete: string[] = [... d3.sort(new Set(props.gesetzeOpen.flatMap((it) => it.sachgebiet || [])))];
 
   return (
     <div>
@@ -46,7 +45,7 @@ function FilterSachgebiet(props: FilterSachgebietProps) {
         id="tags-standard"
         freeSolo={false}
         filterSelectedOptions
-        options={sachgebiete}
+        options={props.options}
         onChange={(_, newValue) => {
           setVal(newValue);
         }}
@@ -66,7 +65,7 @@ function FilterSachgebiet(props: FilterSachgebietProps) {
         isOptionEqualToValue={(option, value) => option === value}
         value={val}
         renderInput={(params) => (
-          <TextField {...params} variant="standard" placeholder="Sachgebiet" margin="normal" fullWidth />
+          <TextField {...params} variant="standard" placeholder={props.placeholder} margin="normal" fullWidth />
         )}
       />
     </div>
@@ -81,6 +80,7 @@ interface Gesetz {
   sachgebiet?: string[];
   vorgangsdauer: number;
   zustimmungsbeduerftigkeit: string[];
+  initiative?: string[];
 }
 
 function GesetzCard(gesetz: Gesetz) {
@@ -91,6 +91,10 @@ function GesetzCard(gesetz: Gesetz) {
         <Divider sx={{ m: 1 }} />
       {gesetz.sachgebiet?.map(sachgebiet => 
         <Chip key={sachgebiet} label={sachgebiet} />
+      )}
+      <Divider sx={{ m: 1 }} />
+      {gesetz.initiative?.map(party =>
+        <Chip key={party} label={party}  variant="outlined"/>
       )}
       </CardContent>
       <CardActions>
@@ -122,32 +126,70 @@ const beratungsstand_runnng = [
 
 function KanbanBoard({gesetze}: KanbanBoardProps) {
   const gesetzeOpen = useMemo<Gesetz[]>(() => gesetze.filter(it => beratungsstand_runnng.includes(it.beratungsstand)), [gesetze])
-  const [gesetzeFilterSachgebiet, setGesetzeFilterSachgebiet] = useState<Gesetz[]>([])
-  const [gesetzeFilterTitle, setGesetzeFilterTitle] = useState<Gesetz[]>([])
+  const [gesetzeFilterSachgebiet, setGesetzeFilterSachgebiet] = useState<string[]>([])
+  const [gesetzeFilterTitle, setGesetzeFilterTitle] = useState<string>("")
+  const [gesetzeFilterInitiative, setGesetzeFilterInitiative] = useState<string[]>([])
+
   const [filterTitleActive, setFilterTitleActive] = useState<boolean>(false);
   const [filterSachgebietActive, setFilterSachgebietActive] = useState<boolean>(false);
+  const [filterInitiativeActive, setFilterInitiativeActive] = useState<boolean>(false);
 
-  const gesetzeViewSachgebiet = useMemo<Gesetz[]>(() => filterSachgebietActive ? gesetzeFilterSachgebiet : gesetzeOpen, [filterSachgebietActive, gesetzeFilterSachgebiet, gesetzeOpen]);
-  const gesetzeViewTitle = useMemo<Gesetz[]>(() => filterTitleActive ? gesetzeFilterTitle : gesetzeViewSachgebiet, [filterTitleActive, gesetzeFilterTitle, gesetzeViewSachgebiet]);
+  const [gesetzeView, setGesetzeView] = useState<Gesetz[]>([])
 
-  const colSize = 400
+  const applyFilter = () => {
+    var gesetze = gesetzeOpen;
+    if (filterTitleActive) {
+      gesetze = gesetze.filter((it) => it.titel.indexOf(gesetzeFilterTitle) > 0);
+    }
+    if (filterSachgebietActive) {
+      gesetze = gesetze.filter((it) => it.sachgebiet?.some((s) => gesetzeFilterSachgebiet.includes(s)))
+    }
+    if (filterInitiativeActive) {
+      gesetze = gesetze.filter((it) => it.initiative?.some((s) => gesetzeFilterInitiative.includes(s)))
+    }
+    setGesetzeView(gesetze)
+  }
+
+  useEffect(() => applyFilter())
+
+  const colSize = 400;
+  const sachgebiete = [... d3.sort(new Set(gesetzeOpen.flatMap((it) => it.sachgebiet || [])))];
+  const initiators = [... d3.sort(new Set(gesetzeOpen.flatMap((it) => it.initiative || [])))];
+
+  const handleFilterSachgebiet = (gesetze: string[]) => {
+    setFilterSachgebietActive(gesetze.length > 0);
+    setGesetzeFilterSachgebiet(gesetze)
+    applyFilter()
+  }
+
+  const handleFilterTitle = (title: string) => {
+    setFilterTitleActive(title.length > 0)
+    setGesetzeFilterTitle(title)
+    applyFilter()
+  }
+
+  const handleFilterInitiative = (gesetze: string[]) => {
+    setFilterInitiativeActive(gesetze.length > 0);
+    setGesetzeFilterInitiative(gesetze)
+    applyFilter()
+  }
 
   return (
     <>
-    <h2>Kanban Board - Gesetzesvorhaben</h2>
+    <h2>Kanban Board - Offene Gesetzesvorhaben</h2>
     <Paper>
     <Grid container spacing={2}>
       <Grid xs={1}>
         Filter
       </Grid>
-      <Grid xs={7}>
-        <FilterSachgebiet gesetzeOpen={gesetzeOpen} setGesetzeView={setGesetzeFilterSachgebiet} setState={setFilterSachgebietActive} />
+      <Grid xs={4}>
+        <FilterWidget options={sachgebiete} callback={handleFilterSachgebiet} placeholder='Sachgebiete' />
+      </Grid>
+      <Grid xs={3}>
+        <FilterWidget options={initiators} callback={handleFilterInitiative} placeholder='Initiative' />
       </Grid>
       <Grid xs={4}>
-        <TextField id="standard-basic" label="Title" variant="standard" onChange={(e) => {
-          setFilterTitleActive(e.target.value.length > 0)
-          setGesetzeFilterTitle(gesetzeViewTitle.filter((it) => it.titel.indexOf(e.target.value) > 0))
-          }} />
+        <TextField id="standard-basic" label="Title" variant="standard" onChange={(e) => {handleFilterTitle(e.target.value)}} />
       </Grid>
     </Grid>
     </Paper>
@@ -160,7 +202,7 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
     }
     {
     beratungsstand_runnng.map(it => {
-      const data = gesetzeViewTitle.filter(g => g.beratungsstand === it)
+      const data = gesetzeView.filter(g => g.beratungsstand === it)
       return <Grid sx={{ width: colSize }} xs={1} key={it}>
         {data.map(g => <GesetzCard key={g.id} {...g} />)}
         </Grid>
