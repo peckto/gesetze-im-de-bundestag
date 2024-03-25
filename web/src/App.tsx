@@ -122,7 +122,7 @@ const beratungsstand_runnng = [
 
 function KanbanBoard({gesetze}: KanbanBoardProps) {
   const gesetzeOpen = useMemo<Gesetz[]>(() => gesetze.filter(it => beratungsstand_runnng.includes(it.beratungsstand)), [gesetze])
-  const [gesetzeFilterSachgebiet, setGesetzeFilterSachebiet] = useState<Gesetz[]>([])
+  const [gesetzeFilterSachgebiet, setGesetzeFilterSachgebiet] = useState<Gesetz[]>([])
   const [gesetzeFilterTitle, setGesetzeFilterTitle] = useState<Gesetz[]>([])
   const [filterTitleActive, setFilterTitleActive] = useState<boolean>(false);
   const [filterSachgebietActive, setFilterSachgebietActive] = useState<boolean>(false);
@@ -141,7 +141,7 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
         Filter
       </Grid>
       <Grid xs={7}>
-        <FilterSachgebiet gesetzeOpen={gesetzeOpen} setGesetzeView={setGesetzeFilterSachebiet} setState={setFilterSachgebietActive} />
+        <FilterSachgebiet gesetzeOpen={gesetzeOpen} setGesetzeView={setGesetzeFilterSachgebiet} setState={setFilterSachgebietActive} />
       </Grid>
       <Grid xs={4}>
         <TextField id="standard-basic" label="Title" variant="standard" onChange={(e) => {
@@ -261,7 +261,7 @@ function App() {
     <>
     <div id='headline'>
     <h1>Überblick zu Gesetzesvorhaben der Deutschen Bundesregierung in der 20. Wahlperiode</h1>
-    <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unfollständige Informationen beinhalten.</h3>
+    <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unvollständige Informationen beinhalten.</h3>
     <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a></p>
     <p>Stand: 24.03.2024</p>
     <p>Fork me on GitHub: <a href="https://github.com/peckto/gesetze-im-de-bundestag">https://github.com/peckto/gesetze-im-de-bundestag</a></p>
