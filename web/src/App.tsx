@@ -183,10 +183,10 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
         Filter
       </Grid>
       <Grid xs={4}>
-        <FilterWidget options={sachgebiete} callback={handleFilterSachgebiet} placeholder='Sachgebiete' />
+        <FilterWidget options={sachgebiete} callback={handleFilterSachgebiet} placeholder='Sachgebiet' />
       </Grid>
       <Grid xs={3}>
-        <FilterWidget options={initiators} callback={handleFilterInitiative} placeholder='Initiative' />
+        <FilterWidget options={initiators} callback={handleFilterInitiative} placeholder='Initiator' />
       </Grid>
       <Grid xs={4}>
         <TextField id="standard-basic" label="Title" variant="standard" onChange={(e) => {handleFilterTitle(e.target.value)}} />
@@ -226,12 +226,17 @@ function Statistics({gesetze}: KanbanBoardProps) {
     return gesetze
   }, [value, gesetze])
 
-  const gesetze_bt = gesetze_filtered.filter(g => g.zustimmungsbeduerftigkeit.filter(z => z.startsWith('Ja')).length === 0)
-  const gesetze_br = gesetze_filtered.filter(g => g.zustimmungsbeduerftigkeit.filter(z => z.startsWith('Ja')).length !== 0)
+  const gesetze_bt = useMemo<Gesetz[]>(() => gesetze_filtered.filter(g => g.zustimmungsbeduerftigkeit.filter(z => z.startsWith('Ja')).length === 0), [gesetze_filtered])
+  const gesetze_br = useMemo<Gesetz[]>(() => gesetze_filtered.filter(g => g.zustimmungsbeduerftigkeit.filter(z => z.startsWith('Ja')).length !== 0), [gesetze_filtered])
   const bin = d3.bin<Gesetz, number>().domain([0, 9999]).thresholds(bins.map(v => v+1)).value(d => d.vorgangsdauer)
-  const hist_bt = bin(gesetze_bt);
-  const hist_br = bin(gesetze_br);
-  const hist = bin(gesetze_filtered);
+  const hist_bt = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_bt), [bin, gesetze_bt])
+  const hist_br = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_br), [bin, gesetze_br])
+  const hist = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_filtered), [bin, gesetze_filtered])
+
+  // const sachgebiete = [... d3.sort(new Set(gesetze.flatMap((it) => it.sachgebiet || [])))];
+  const initiators = useMemo<string[]>(() =>  [... d3.sort(new Set(gesetze.flatMap((it) => it.initiative || [])))], [gesetze]);
+
+  const initiator_hist = useMemo<Object>(() =>  Object.fromEntries(initiators.map((it) => [it,  gesetze_filtered.filter((g) => g.initiative?.includes(it)).length])), [gesetze_filtered, initiators])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -254,6 +259,8 @@ function Statistics({gesetze}: KanbanBoardProps) {
         <FormControlLabel value="running" control={<Radio />} label="Offen" />
       </RadioGroup>
     </FormControl>
+
+    <h3>Anzahl Gesetzesvorhaben nach Vorgangsdauer</h3>
     <BarChart
       width={700}
       height={500}
@@ -269,8 +276,9 @@ function Statistics({gesetze}: KanbanBoardProps) {
           horizontal: "middle"
         }
       }}
-    >
-    </BarChart>
+    />
+
+    <h3>Gesetzesvorhaben nach Vorgangsdauer</h3>
     {
       hist.map((gesetze, idx) => (
       <Accordion key={"Accordion-"+bins[idx]}>
@@ -286,6 +294,27 @@ function Statistics({gesetze}: KanbanBoardProps) {
       </Accordion>
       ))
     }
+
+    <h3>Initiator</h3>
+    {
+      Object.keys(initiator_hist).length > 0 && <BarChart
+      width={900}
+      height={600}
+      margin={{ top: 5, right: 30, left: 250, bottom: 20 }}
+      series={[
+        { data: Object.values(initiator_hist), label: 'Initiator', id: 'bt' },
+      ]}
+      yAxis={[{ scaleType: 'band', data: Object.keys(initiator_hist), id: 'anzahl-gesetze' }]}
+      legend={{
+        direction: "column",
+        position: {
+          vertical: "top",
+          horizontal: "middle"
+        }
+      }}
+      layout="horizontal"
+    />
+  }
     
     </>
   )
