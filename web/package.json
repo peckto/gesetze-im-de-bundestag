@@ -17,6 +17,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.14",
     "@mui/material": "^5.13.1",
     "@mui/x-charts": "^6.0.0-alpha.12",
     "@types/d3-array": "^3.0.8",
