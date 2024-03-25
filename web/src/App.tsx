@@ -106,6 +106,8 @@ function GesetzCard(gesetz: Gesetz) {
 
 interface KanbanBoardProps {
   gesetze: Gesetz[];
+  initiators: string[];
+  sachgebiete: string[];
 }
 
 // all beratungsstand to display in board
@@ -124,7 +126,7 @@ const beratungsstand_runnng = [
   'Den Ausschüssen zugewiesen'
 ]
 
-function KanbanBoard({gesetze}: KanbanBoardProps) {
+function KanbanBoard({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
   const gesetzeOpen = useMemo<Gesetz[]>(() => gesetze.filter(it => beratungsstand_runnng.includes(it.beratungsstand)), [gesetze])
   const [gesetzeFilterSachgebiet, setGesetzeFilterSachgebiet] = useState<string[]>([])
   const [gesetzeFilterTitle, setGesetzeFilterTitle] = useState<string>("")
@@ -153,8 +155,6 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
   useEffect(() => applyFilter())
 
   const colSize = 400;
-  const sachgebiete = [... d3.sort(new Set(gesetzeOpen.flatMap((it) => it.sachgebiet || [])))];
-  const initiators = [... d3.sort(new Set(gesetzeOpen.flatMap((it) => it.initiative || [])))];
 
   const handleFilterSachgebiet = (gesetze: string[]) => {
     setFilterSachgebietActive(gesetze.length > 0);
@@ -213,7 +213,7 @@ function KanbanBoard({gesetze}: KanbanBoardProps) {
   )
 }
 
-function Statistics({gesetze}: KanbanBoardProps) {
+function Statistics({gesetze, initiators}: KanbanBoardProps) {
   const [value, setValue] = useState('published');
   const bins = [7, 14, 30, 60, 120, 240, 365];
   const bins_label = [...bins, '>365']
@@ -232,9 +232,6 @@ function Statistics({gesetze}: KanbanBoardProps) {
   const hist_bt = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_bt), [bin, gesetze_bt])
   const hist_br = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_br), [bin, gesetze_br])
   const hist = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_filtered), [bin, gesetze_filtered])
-
-  // const sachgebiete = [... d3.sort(new Set(gesetze.flatMap((it) => it.sachgebiet || [])))];
-  const initiators = useMemo<string[]>(() =>  [... d3.sort(new Set(gesetze.flatMap((it) => it.initiative || [])))], [gesetze]);
 
   const initiator_hist = useMemo<Object>(() =>  Object.fromEntries(initiators.map((it) => [it,  gesetze_filtered.filter((g) => g.initiative?.includes(it)).length])), [gesetze_filtered, initiators])
 
@@ -329,6 +326,13 @@ function App() {
     .then(data => setGesetze(data))
   }, [setGesetze])
 
+  const sachgebiete = useMemo<string[]>(() => [... d3.sort(new Set(gesetze.flatMap((it) => it.sachgebiet || [])))], [gesetze]);
+  const initiators = useMemo<string[]>(() => [... d3.sort(new Set(gesetze.flatMap((it) => it.initiative || [])))], [gesetze]);
+  const initators_fraktion = useMemo<string[]>(() => initiators.filter((it) => it.startsWith('Fraktion')), [initiators])
+  const initators_ausschuss = useMemo<string[]>(() => initiators.filter((it) => it.includes('usschuss')), [initiators])
+  const initiator_land = useMemo<string[]>(() => (initiators.filter((it) => initators_fraktion.indexOf(it) < 0 && initators_ausschuss.indexOf(it) < 0 && it !== 'Bundesregierung')), [initiators, initators_fraktion, initators_ausschuss])
+  const initiator_sort = useMemo<string[]>(() => ['Bundesregierung', ...initators_fraktion, ...initiator_land, ...initators_ausschuss], [initators_fraktion, initiator_land, initators_ausschuss])
+
   return (
     <>
     <div id='headline'>
@@ -341,9 +345,9 @@ function App() {
     </div>
     <br />
     
-    <Statistics gesetze={gesetze}/>
+    <Statistics gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} />
     <Divider sx={{ m: 10 }} />
-    <KanbanBoard gesetze={gesetze}/>
+    <KanbanBoard gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} />
     </>
   )
 }
