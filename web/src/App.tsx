@@ -217,14 +217,15 @@ function Statistics({gesetze}: KanbanBoardProps) {
   const [value, setValue] = useState('published');
   const bins = [7, 14, 30, 60, 120, 240, 365];
   const bins_label = [...bins, '>365']
-  var gesetze_filtered = undefined
-  if (value === 'published') {
-    gesetze_filtered = gesetze.filter(g => g.beratungsstand == 'Verkündet')
-  } else if (value === 'running') {
-    gesetze_filtered = gesetze.filter(it => beratungsstand_runnng.includes(it.beratungsstand))
-  } else {
-    gesetze_filtered = gesetze
-  }
+  const gesetze_filtered = useMemo<Gesetz[]>(() => {
+    if (value === 'published') {
+      return gesetze.filter(g => g.beratungsstand == 'Verkündet')
+    } else if (value === 'running') {
+      return gesetze.filter(it => beratungsstand_runnng.includes(it.beratungsstand))
+    }
+    return gesetze
+  }, [value, gesetze])
+
   const gesetze_bt = gesetze_filtered.filter(g => g.zustimmungsbeduerftigkeit.filter(z => z.startsWith('Ja')).length === 0)
   const gesetze_br = gesetze_filtered.filter(g => g.zustimmungsbeduerftigkeit.filter(z => z.startsWith('Ja')).length !== 0)
   const bin = d3.bin<Gesetz, number>().domain([0, 9999]).thresholds(bins.map(v => v+1)).value(d => d.vorgangsdauer)
