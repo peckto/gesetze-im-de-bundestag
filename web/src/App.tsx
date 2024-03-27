@@ -87,7 +87,7 @@ interface Gesetz {
 
 function GesetzCard(gesetz: Gesetz) {
   return (
-    <Card sx={{ minWidth: 275, m: 2 }}>
+    <Card sx={{ minWidth: 275, maxWidth: 500, m: 2 }}>
       <CardContent>
         {gesetz.titel}
         <Divider sx={{ m: 1 }} />
