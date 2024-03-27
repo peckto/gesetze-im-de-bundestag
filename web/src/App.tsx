@@ -82,6 +82,7 @@ interface Gesetz {
   vorgangsdauer: number;
   zustimmungsbeduerftigkeit: string[];
   initiative?: string[];
+  keywords?: string[];
 }
 
 function GesetzCard(gesetz: Gesetz) {
@@ -109,6 +110,7 @@ interface KanbanBoardProps {
   gesetze: Gesetz[];
   initiators: string[];
   sachgebiete: string[];
+  keywords: string[];
 }
 
 // all beratungsstand to display in board
@@ -127,19 +129,21 @@ const beratungsstand_runnng = [
   'Den Ausschüssen zugewiesen'
 ]
 
-function KanbanBoard({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
+function KanbanBoard({gesetze, initiators, sachgebiete, keywords}: KanbanBoardProps) {
   const gesetzeOpen = useMemo<Gesetz[]>(() => gesetze.filter(it => beratungsstand_runnng.includes(it.beratungsstand)), [gesetze])
   const [gesetzeFilterSachgebiet, setGesetzeFilterSachgebiet] = useState<string[]>([])
   const [gesetzeFilterTitle, setGesetzeFilterTitle] = useState<string>("")
   const [gesetzeFilterInitiative, setGesetzeFilterInitiative] = useState<string[]>([])
+  const [gesetzeFilterKeyword, setGesetzeFilterKeyword] = useState<string[]>([]);
 
   const [filterTitleActive, setFilterTitleActive] = useState<boolean>(false);
   const [filterSachgebietActive, setFilterSachgebietActive] = useState<boolean>(false);
   const [filterInitiativeActive, setFilterInitiativeActive] = useState<boolean>(false);
+  const [filterKeywordActive, setFilterKeywordActive] = useState<boolean>(false);
 
   const [gesetzeView, setGesetzeView] = useState<Gesetz[]>([])
 
-  const applyFilter = (sachegebiete: string[], initiators: string[], title: string, sachgebietActive: boolean, initiatorsActive: boolean, titleActive: boolean) => {
+  const applyFilter = (sachegebiete: string[], initiators: string[], title: string, keywordsFilter: string[], sachgebietActive: boolean, initiatorsActive: boolean, titleActive: boolean, keywordsActive: boolean) => {
     var gesetze = gesetzeOpen;
     if (titleActive) {
       gesetze = gesetze.filter((it) => it.titel.indexOf(title) >= 0);
@@ -150,10 +154,13 @@ function KanbanBoard({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
     if (initiatorsActive) {
       gesetze = gesetze.filter((it) => it.initiative?.some((s) => initiators.includes(s)))
     }
+    if (keywordsActive) {
+      gesetze = gesetze.filter((it) => it.keywords?.some((s) => keywordsFilter.includes(s)))
+    }
     setGesetzeView(gesetze)
   }
 
-  useEffect(() => {gesetzeView.length === 0 && applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, filterSachgebietActive, filterInitiativeActive, filterTitleActive)})
+  useEffect(() => {gesetzeView.length === 0 && applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, gesetzeFilterKeyword, filterSachgebietActive, filterInitiativeActive, filterTitleActive, filterKeywordActive)})
 
   const colSize = 400;
 
@@ -161,39 +168,49 @@ function KanbanBoard({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
     const sachgebietActive: boolean = sachgebiete.length > 0;
     setFilterSachgebietActive(sachgebietActive);
     setGesetzeFilterSachgebiet(sachgebiete)
-    applyFilter(sachgebiete, gesetzeFilterInitiative, gesetzeFilterTitle, sachgebietActive, filterInitiativeActive, filterTitleActive)
+    applyFilter(sachgebiete, gesetzeFilterInitiative, gesetzeFilterTitle, gesetzeFilterKeyword, sachgebietActive, filterInitiativeActive, filterTitleActive, filterKeywordActive)
   }
 
   const handleFilterTitle = (title: string) => {
     const titleActive: boolean = title.length > 0;
     setFilterTitleActive(titleActive)
     setGesetzeFilterTitle(title)
-    applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, title, filterSachgebietActive, filterInitiativeActive, titleActive)
+    applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, title, gesetzeFilterKeyword, filterSachgebietActive, filterInitiativeActive, titleActive, filterKeywordActive)
   }
 
   const handleFilterInitiative = (initiators: string[]) => {
     const initiatorsActive: boolean = initiators.length > 0
     setFilterInitiativeActive(initiatorsActive);
     setGesetzeFilterInitiative(initiators)
-    applyFilter(gesetzeFilterSachgebiet, initiators, gesetzeFilterTitle, filterSachgebietActive, initiatorsActive, filterTitleActive)
+    applyFilter(gesetzeFilterSachgebiet, initiators, gesetzeFilterTitle, gesetzeFilterKeyword, filterSachgebietActive, initiatorsActive, filterTitleActive, filterKeywordActive)
+  }
+
+  const handleFilterKeyword = (keywords: string[]) => {
+    const keywordsActive: boolean = keywords.length > 0
+    setFilterKeywordActive(keywordsActive);
+    setGesetzeFilterKeyword(keywords)
+    applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, keywords, filterSachgebietActive, filterInitiativeActive, filterTitleActive, keywordsActive)
   }
 
   return (
     <>
     <h2>Kanban Board - Offene Gesetzesvorhaben</h2>
-    <Paper>
+    <Paper sx={{ p: 1 }}>
+    <b>Filter</b>
     <Grid container spacing={2}>
-      <Grid item={true} xs={1}>
-        Filter
-      </Grid>
-      <Grid item={true} xs={4}>
+      <Grid item={true} xs={7}>
         <FilterWidget options={sachgebiete} callback={handleFilterSachgebiet} placeholder='Sachgebiet' />
       </Grid>
-      <Grid item={true} xs={3}>
+      <Grid item={true} xs={5}>
         <FilterWidget options={initiators} callback={handleFilterInitiative} placeholder='Initiator' />
       </Grid>
-      <Grid item={true} xs={4}>
-        <TextField id="standard-basic" label="Title" variant="standard" onChange={(e) => {handleFilterTitle(e.target.value)}} />
+    </Grid>
+    <Grid container spacing={2}>
+      <Grid item={true} xs={7}>
+        <FilterWidget options={keywords} callback={handleFilterKeyword} placeholder='Keywords' />
+      </Grid>
+      <Grid item={true} xs={5}>
+        <TextField fullWidth={true} id="standard-basic" label="Title" variant="standard" onChange={(e) => {handleFilterTitle(e.target.value)}} />
       </Grid>
     </Grid>
     </Paper>
@@ -342,6 +359,7 @@ function App() {
 
   const sachgebiete = useMemo<string[]>(() => [... d3.sort(new Set(gesetze.flatMap((it) => it.sachgebiet || [])))], [gesetze]);
   const initiators = useMemo<string[]>(() => [... d3.sort(new Set(gesetze.flatMap((it) => it.initiative || [])))], [gesetze]);
+  const keywords = useMemo<string[]>(() => [... d3.sort(new Set(gesetze.flatMap((it) => it.keywords || [])))], [gesetze]);
   const initators_fraktion = useMemo<string[]>(() => initiators.filter((it) => it.startsWith('Fraktion')), [initiators])
   const initators_ausschuss = useMemo<string[]>(() => initiators.filter((it) => it.includes('usschuss')), [initiators])
   const initiator_land = useMemo<string[]>(() => (initiators.filter((it) => initators_fraktion.indexOf(it) < 0 && initators_ausschuss.indexOf(it) < 0 && it !== 'Bundesregierung')), [initiators, initators_fraktion, initators_ausschuss])
@@ -359,9 +377,9 @@ function App() {
     </div>
     <br />
     
-    <Statistics gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} />
+    <Statistics gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} keywords={keywords} />
     <Divider sx={{ m: 10 }} />
-    <KanbanBoard gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} />
+    <KanbanBoard gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} keywords={keywords} />
     </>
   )
 }
