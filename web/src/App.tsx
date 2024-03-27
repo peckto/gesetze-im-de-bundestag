@@ -217,7 +217,7 @@ function KanbanBoard({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
   )
 }
 
-function Statistics({gesetze, initiators}: KanbanBoardProps) {
+function Statistics({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
   const [value, setValue] = useState('published');
   const bins = [7, 14, 30, 60, 120, 240, 365];
   const bins_label = [...bins, '>365']
@@ -242,6 +242,7 @@ function Statistics({gesetze, initiators}: KanbanBoardProps) {
   const hist = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_filtered), [bin, gesetze_filtered])
 
   const initiator_hist = useMemo<Object>(() =>  Object.fromEntries(initiators.map((it) => [it,  gesetze_filtered.filter((g) => g.initiative?.includes(it)).length])), [gesetze_filtered, initiators])
+  const sachgebiete_hist = useMemo<Object>(() =>  Object.fromEntries(sachgebiete.map((it) => [it,  gesetze_filtered.filter((g) => g.sachgebiet?.includes(it)).length])), [gesetze_filtered, sachgebiete])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
@@ -304,7 +305,7 @@ function Statistics({gesetze, initiators}: KanbanBoardProps) {
       height={600}
       margin={{ top: 50, right: 30, left: 250, bottom: 20 }}
       series={[
-        { data: Object.values(initiator_hist), label: 'Initiator', id: 'bt' },
+        { data: Object.values(initiator_hist), label: 'Anzahl Gesetze mit Initiator (mehrfachnennung möglich)', id: 'bt' },
       ]}
       yAxis={[{ scaleType: 'band', data: Object.keys(initiator_hist), id: 'anzahl-gesetze' }]}
 
@@ -312,6 +313,20 @@ function Statistics({gesetze, initiators}: KanbanBoardProps) {
     />
   }
     
+    <h3>Sachgebiete</h3>
+    {
+      Object.keys(sachgebiete_hist).length > 0 && <BarChart
+      width={1200}
+      height={700}
+      margin={{ top: 50, right: 30, left: 350, bottom: 20 }}
+      series={[
+        { data: Object.values(sachgebiete_hist), label: 'Anzahl Gesetze mit Sachgebiet (mehrfachnennung möglich)', id: 'bt' },
+      ]}
+      yAxis={[{ scaleType: 'band', data: Object.keys(sachgebiete_hist), id: 'anzahl-gesetze' }]}
+
+      layout="horizontal"
+    />
+    }
     </>
   )
 }
