@@ -22,6 +22,10 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+    - uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-${{ hashFiles('web/package.json') }}-${{ hashFiles('web/package-lock.json') }}
     - name: Install dependencies
       working-directory: ./web
       # Using npm ci is generally faster than running npm i because it caches dependencies
@@ -30,6 +34,7 @@ jobs:
     - name: Build the app
       working-directory: ./web
       run: |
+        npm run lint
         npm run build
     - name: Run component tests
       working-directory: ./web
@@ -44,7 +49,7 @@ jobs:
   deploy-web:
     runs-on: ubuntu-latest
     needs: build-web
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
 
     steps:
     - uses: Gr1N/setup-poetry@v9
