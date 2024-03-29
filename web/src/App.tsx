@@ -144,7 +144,7 @@ function KanbanBoard({gesetze, initiators, sachgebiete, keywords}: KanbanBoardPr
   const [gesetzeView, setGesetzeView] = useState<Gesetz[]>([])
 
   const applyFilter = (sachegebiete: string[], initiators: string[], title: string, keywordsFilter: string[], sachgebietActive: boolean, initiatorsActive: boolean, titleActive: boolean, keywordsActive: boolean) => {
-    var gesetze = gesetzeOpen;
+    let gesetze = gesetzeOpen;
     if (titleActive) {
       gesetze = gesetze.filter((it) => it.titel.indexOf(title) >= 0);
     }
@@ -258,8 +258,8 @@ function Statistics({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
   const hist_br = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_br), [bin, gesetze_br])
   const hist = useMemo<d3.Bin<Gesetz, number>[]>(() => bin(gesetze_filtered), [bin, gesetze_filtered])
 
-  const initiator_hist = useMemo<Object>(() =>  Object.fromEntries(initiators.map((it) => [it,  gesetze_filtered.filter((g) => g.initiative?.includes(it)).length])), [gesetze_filtered, initiators])
-  const sachgebiete_hist = useMemo<Object>(() =>  Object.fromEntries(sachgebiete.map((it) => [it,  gesetze_filtered.filter((g) => g.sachgebiet?.includes(it)).length])), [gesetze_filtered, sachgebiete])
+  const initiator_hist = useMemo<object>(() =>  Object.fromEntries(initiators.map((it) => [it,  gesetze_filtered.filter((g) => g.initiative?.includes(it)).length])), [gesetze_filtered, initiators])
+  const sachgebiete_hist = useMemo<object>(() =>  Object.fromEntries(sachgebiete.map((it) => [it,  gesetze_filtered.filter((g) => g.sachgebiet?.includes(it)).length])), [gesetze_filtered, sachgebiete])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue((event.target as HTMLInputElement).value);
