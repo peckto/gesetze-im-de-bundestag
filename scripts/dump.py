@@ -22,8 +22,8 @@ def dump(url: str, args: dict[str, str]):
         cursor = j['cursor']
         data += j['documents']
         # rate limit
-        time.sleep(0.3)
-    time.sleep(0.3)
+        time.sleep(0.4)
+    time.sleep(0.4)
     return data
 
 
