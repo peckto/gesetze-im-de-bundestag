@@ -371,7 +371,7 @@ function App() {
     <h1>Überblick zu Gesetzesvorhaben der Deutschen Bundesregierung in der 20. Wahlperiode</h1>
     <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unvollständige Informationen beinhalten.</h3>
     <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a></p>
-    <p>Stand: 24.03.2024</p>
+    <p>Stand: {(new Date(__BUILD_DATE__)).toLocaleDateString('de-DE')}</p>
     <p>Fork me on GitHub: <a href="https://github.com/peckto/gesetze-im-de-bundestag">https://github.com/peckto/gesetze-im-de-bundestag</a></p>
     <Divider />
     </div>
