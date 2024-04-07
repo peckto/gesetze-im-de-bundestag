@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => {
     plugins: [
       reactRefresh(),
     ],
+    define: {
+      __BUILD_DATE__: new Date(),
+    },
     test: {
       globals: true,
       environment: 'jsdom',
