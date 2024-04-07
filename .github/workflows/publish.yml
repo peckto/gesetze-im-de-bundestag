@@ -73,6 +73,7 @@ jobs:
         name: artifact-data
         path: |
           scripts/gesetze.json
+          scripts/tagesordnung.json
   
   deploy-test:
     runs-on: ubuntu-latest
