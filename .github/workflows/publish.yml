@@ -92,6 +92,8 @@ jobs:
         pattern: artifact-*
         merge-multiple: true
     - run: ls -R artifact
+    - name: Add CNAME
+      run: echo "gesetze.peckto.de" > artifact/CNAME
     - name: Deploy to Github Pages
       uses: crazy-max/ghaction-github-pages@v4
       with:
