@@ -85,6 +85,10 @@ interface Gesetz {
   keywords?: string[];
 }
 
+type Tagesordnung = {
+  [key: string]: string[];
+};
+
 function GesetzCard(gesetz: Gesetz) {
   return (
     <Card sx={{ minWidth: 275, maxWidth: 500, m: 2 }}>
@@ -111,6 +115,11 @@ interface KanbanBoardProps {
   initiators: string[];
   sachgebiete: string[];
   keywords: string[];
+}
+
+interface TagesordnungProps {
+  tagesordnung: Tagesordnung;
+  gesetze: Gesetz[];
 }
 
 // all beratungsstand to display in board
@@ -348,14 +357,45 @@ function Statistics({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
   )
 }
 
+function Tagesordnung({gesetze, tagesordnung}: TagesordnungProps) {
+  return (
+    <>
+    <h2>Gesetzesentwürfe in der Tagesordnung des Deutschen Bundestags</h2>
+    {
+      Object.keys(tagesordnung).map((day, idx) => (
+        <Accordion key={"Accordion-"+idx}>
+        <AccordionSummary
+          expandIcon={<ArrowDropDownIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+        >
+        <Typography>{day} ({tagesordnung[day].length})</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+        {gesetze.filter((gesetz) => tagesordnung[day].includes(gesetz.id)).map(g => <GesetzCard key={g.id} {...g} />)}
+        </AccordionDetails>
+        </Accordion>
+      ))
+    }
+    </>
+  )
+}
+
 function App() {
   const [gesetze, setGesetze] = useState<Gesetz[]>([])
+  const [tagesordnung, setTagesordnung] = useState<Tagesordnung>({})
 
   useEffect(() => {
     fetch('gesetze.json')
     .then(response => response.json())
     .then(data => setGesetze(data))
   }, [setGesetze])
+
+  useEffect(() => {
+    fetch('tagesordnung.json')
+    .then(response => response.json())
+    .then(data => setTagesordnung(data))
+  }, [setTagesordnung])
 
   const sachgebiete = useMemo<string[]>(() => [... d3.sort(new Set(gesetze.flatMap((it) => it.sachgebiet || [])))], [gesetze]);
   const initiators = useMemo<string[]>(() => [... d3.sort(new Set(gesetze.flatMap((it) => it.initiative || [])))], [gesetze]);
@@ -370,13 +410,15 @@ function App() {
     <div id='headline'>
     <h1>Überblick zu Gesetzesvorhaben der Deutschen Bundesregierung in der 20. Wahlperiode</h1>
     <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unvollständige Informationen beinhalten.</h3>
-    <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a></p>
+    <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a>, <a href="https://www.bundestag.de/tagesordnung">https://www.bundestag.de/tagesordnung</a></p>
     <p>Stand: {(new Date(__BUILD_DATE__)).toLocaleDateString('de-DE')}</p>
     <p>Fork me on GitHub: <a href="https://github.com/peckto/gesetze-im-de-bundestag">https://github.com/peckto/gesetze-im-de-bundestag</a></p>
     <Divider />
     </div>
     <br />
     
+    <Tagesordnung gesetze={gesetze} tagesordnung={tagesordnung} />
+    <Divider sx={{ m: 10 }} />
     <Statistics gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} keywords={keywords} />
     <Divider sx={{ m: 10 }} />
     <KanbanBoard gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} keywords={keywords} />
