@@ -4,7 +4,7 @@ import requests
 import time
 
 
-API_KEY = 'I9FKdCn.hbfefNWCY336dL6x62vfwNKpoN2RZ1gp21'
+API_KEY = 'OSOegLs.PR2lwJ1dwCeje9vTj7FPOt3hvpYKtwKkhw'
 
 
 def dump(url: str, args: dict[str, str]):
@@ -32,14 +32,14 @@ def dump(url: str, args: dict[str, str]):
 
 def dump_vorgang():
     url = 'https://search.dip.bundestag.de/api/v1/vorgang'
-    args = {'f.wahlperiode': '20', 'format': 'json', 'apikey': API_KEY}
+    args = {'f.wahlperiode': '21', 'format': 'json', 'apikey': API_KEY}
     vorgang = dump(url, args)
     json.dump(vorgang, open('vorgang.json', 'wt'), indent=4)
 
 
 def dump_vorgangsposition():
     url = 'https://search.dip.bundestag.de/api/v1/vorgangsposition'
-    args = {'f.wahlperiode': '20', 'format': 'json', 'apikey': API_KEY}
+    args = {'f.wahlperiode': '21', 'format': 'json', 'apikey': API_KEY}
     vorgang = dump(url, args)
     json.dump(vorgang, open('vorgangsposition.json', 'wt'), indent=4)
 
