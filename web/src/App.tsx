@@ -207,18 +207,18 @@ function KanbanBoard({gesetze, initiators, sachgebiete, keywords}: KanbanBoardPr
     <Paper sx={{ p: 1 }}>
     <b>Filter</b>
     <Grid container spacing={2}>
-      <Grid item={true} size={{xs:7}}>
+      <Grid size={{xs:7}}>
         <FilterWidget options={sachgebiete} callback={handleFilterSachgebiet} placeholder='Sachgebiet' />
       </Grid>
-      <Grid item={true} size={{xs:5}}>
+      <Grid size={{xs:5}}>
         <FilterWidget options={initiators} callback={handleFilterInitiative} placeholder='Initiator' />
       </Grid>
     </Grid>
     <Grid container spacing={2}>
-      <Grid item={true} size={{xs:7}}>
+      <Grid size={{xs:7}}>
         <FilterWidget options={keywords} callback={handleFilterKeyword} placeholder='Keywords' />
       </Grid>
-      <Grid item={true} size={{xs:5}}>
+      <Grid size={{xs:5}}>
         <TextField fullWidth={true} id="standard-basic" label="Title" variant="standard" onChange={(e) => {handleFilterTitle(e.target.value)}} />
       </Grid>
     </Grid>
@@ -227,13 +227,13 @@ function KanbanBoard({gesetze, initiators, sachgebiete, keywords}: KanbanBoardPr
     <Grid container spacing={2} sx={{ width: colSize*(beratungsstand_runnng.length + 1)}}>
     {
     beratungsstand_runnng.map(it => (
-      <Grid sx={{ width: colSize }} item={true} xs={1} key={it}><b>{it} ({gesetzeView.filter(g => g.beratungsstand === it).length})</b></Grid>
+      <Grid sx={{ width: colSize }} size={{xs:1}} key={it}><b>{it} ({gesetzeView.filter(g => g.beratungsstand === it).length})</b></Grid>
     ))
     }
     {
     beratungsstand_runnng.map(it => {
       const data = gesetzeView.filter(g => g.beratungsstand === it)
-      return <Grid sx={{ width: colSize }} item={true} xs={1} key={it}>
+      return <Grid sx={{ width: colSize }} size={{xs:1}} key={it}>
         {data.map(g => <GesetzCard key={g.id} {...g} />)}
         </Grid>
     })
