@@ -207,24 +207,24 @@ function KanbanBoard({gesetze, initiators, sachgebiete, keywords}: KanbanBoardPr
     <Paper sx={{ p: 1 }}>
     <b>Filter</b>
     <Grid container spacing={2}>
-      <Grid item={true} xs={7}>
+      <Grid item={true} size={{xs:7}}>
         <FilterWidget options={sachgebiete} callback={handleFilterSachgebiet} placeholder='Sachgebiet' />
       </Grid>
-      <Grid item={true} xs={5}>
+      <Grid item={true} size={{xs:5}}>
         <FilterWidget options={initiators} callback={handleFilterInitiative} placeholder='Initiator' />
       </Grid>
     </Grid>
     <Grid container spacing={2}>
-      <Grid item={true} xs={7}>
+      <Grid item={true} size={{xs:7}}>
         <FilterWidget options={keywords} callback={handleFilterKeyword} placeholder='Keywords' />
       </Grid>
-      <Grid item={true} xs={5}>
+      <Grid item={true} size={{xs:5}}>
         <TextField fullWidth={true} id="standard-basic" label="Title" variant="standard" onChange={(e) => {handleFilterTitle(e.target.value)}} />
       </Grid>
     </Grid>
     </Paper>
     <Box sx={{ m: 1 }} />
-    <Grid container spacing={2} sx={{ width: colSize*12 }}>
+    <Grid container spacing={2} sx={{ width: colSize*(beratungsstand_runnng.length + 1)}}>
     {
     beratungsstand_runnng.map(it => (
       <Grid sx={{ width: colSize }} item={true} xs={1} key={it}><b>{it} ({gesetzeView.filter(g => g.beratungsstand === it).length})</b></Grid>
@@ -327,13 +327,13 @@ function Statistics({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
     <h3>Initiator</h3>
     {
       Object.keys(initiator_hist).length > 0 && <BarChart
-      width={900}
+      width={1100}
       height={600}
-      margin={{ top: 50, right: 30, left: 250, bottom: 20 }}
+      margin={{ top: 50, right: 30, left: 150, bottom: 20 }}
       series={[
         { data: Object.values(initiator_hist), label: 'Anzahl Gesetze mit Initiator (mehrfachnennung möglich)', id: 'bt' },
       ]}
-      yAxis={[{ scaleType: 'band', data: Object.keys(initiator_hist), id: 'anzahl-gesetze' }]}
+      yAxis={[{ scaleType: 'band', data: Object.keys(initiator_hist), id: 'anzahl-gesetze', width: 220 }]}
 
       layout="horizontal"
     />
@@ -342,13 +342,13 @@ function Statistics({gesetze, initiators, sachgebiete}: KanbanBoardProps) {
     <h3>Sachgebiete</h3>
     {
       Object.keys(sachgebiete_hist).length > 0 && <BarChart
-      width={1200}
+      width={1500}
       height={700}
       margin={{ top: 50, right: 30, left: 350, bottom: 20 }}
       series={[
         { data: Object.values(sachgebiete_hist), label: 'Anzahl Gesetze mit Sachgebiet (mehrfachnennung möglich)', id: 'bt' },
       ]}
-      yAxis={[{ scaleType: 'band', data: Object.keys(sachgebiete_hist), id: 'anzahl-gesetze' }]}
+      yAxis={[{ scaleType: 'band', data: Object.keys(sachgebiete_hist), id: 'anzahl-gesetze', width: 270 }]}
 
       layout="horizontal"
     />
@@ -408,7 +408,7 @@ function App() {
   return (
     <>
     <div id='headline'>
-    <h1>Überblick zu Gesetzesvorhaben der Deutschen Bundesregierung in der 20. Wahlperiode</h1>
+    <h1>Überblick zu Gesetzesvorhaben der Deutschen Bundesregierung in der 21. Wahlperiode</h1>
     <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unvollständige Informationen beinhalten.</h3>
     <p>Quelle: <a href="https://dip.bundestag.de">https://dip.bundestag.de/</a>, <a href="https://search.dip.bundestag.de/api/v1/swagger-ui/#">https://search.dip.bundestag.de/api/v1/swagger-ui/#</a>, <a href="https://www.bundestag.de/tagesordnung">https://www.bundestag.de/tagesordnung</a></p>
     <p>Stand: {(new Date(__BUILD_DATE__)).toLocaleDateString('de-DE')}</p>
