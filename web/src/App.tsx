@@ -18,6 +18,9 @@ import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import CssBaseline from '@mui/material/CssBaseline';
 
 import FormLabel from '@mui/material/FormLabel';
 import { BarChart } from '@mui/x-charts';
@@ -405,8 +408,20 @@ function App() {
   const initiator_land = useMemo<string[]>(() => (initiators.filter((it) => initators_fraktion.indexOf(it) < 0 && initators_ausschuss.indexOf(it) < 0 && it !== 'Bundesregierung')), [initiators, initators_fraktion, initators_ausschuss])
   const initiator_sort = useMemo<string[]>(() => ['Bundesregierung', ...initators_fraktion, ...initiator_land, ...initators_ausschuss], [initators_fraktion, initiator_land, initators_ausschuss])
 
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const theme = useMemo(
+  () =>
+    createTheme({
+      palette: {
+        mode: prefersDarkMode ? 'dark' : 'light',
+      },
+    }),
+  [prefersDarkMode],
+);
+
   return (
-    <>
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
     <div id='headline'>
     <h1>Überblick zu Gesetzesvorhaben der Deutschen Bundesregierung in der 21. Wahlperiode</h1>
     <h3>Disclaimer: Diese Seite befindet sich noch im Aufbau und kann falsche oder unvollständige Informationen beinhalten.</h3>
@@ -422,7 +437,7 @@ function App() {
     <Statistics gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} keywords={keywords} />
     <Divider sx={{ m: 10 }} />
     <KanbanBoard gesetze={gesetze} initiators={initiator_sort} sachgebiete={sachgebiete} keywords={keywords} />
-    </>
+  </ThemeProvider>
   )
 }
 
