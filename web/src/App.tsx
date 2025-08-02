@@ -169,7 +169,7 @@ function KanbanBoard({gesetze, initiators, sachgebiete, keywords}: KanbanBoardPr
     setGesetzeView(gesetze)
   }
 
-  useEffect(() => {gesetzeView.length === 0 && applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, gesetzeFilterKeyword, filterSachgebietActive, filterInitiativeActive, filterTitleActive, filterKeywordActive)})
+  useEffect(() => {if (gesetzeView.length === 0) applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, gesetzeFilterKeyword, filterSachgebietActive, filterInitiativeActive, filterTitleActive, filterKeywordActive)})
 
   const colSize = 400;
 
