@@ -4,7 +4,7 @@ import requests
 import time
 
 
-API_KEY = 'OSOegLs.PR2lwJ1dwCeje9vTj7FPOt3hvpYKtwKkhw'
+API_KEY = 'R2BZaee.DjdCyihKZMf8AOjtScubP2EVydegzjmBIQ'
 
 
 def dump(url: str, args: dict[str, str]):
