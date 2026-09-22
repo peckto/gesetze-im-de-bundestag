@@ -160,3 +160,11 @@ cython_debug/
 .idea/
 
 .vite/
+
+# generated files
+scripts/gesetze.json
+scripts/tagesordnung.json
+scripts/vorgang.json
+scripts/vorgangsposition.json
+web/public/gesetze.json
+web/public/tagesordnung.json
