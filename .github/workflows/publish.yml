@@ -54,22 +54,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - uses: astral-sh/setup-uv@v7
       with:
         python-version: '3.14'
-    - uses: Gr1N/setup-poetry@v9
-    - uses: actions/cache@v4
-      with:
-        path: ~/.cache/pypoetry/virtualenvs
-        key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}-${{ hashFiles('pyproject.toml') }}
+        enable-cache: true
     - name: Install Dependencies
       run: |
-        poetry install
+        uv sync --locked
     - name: Build data
       working-directory: ./scripts
       run: |
-        poetry run ./dump.py
-        poetry run jupyter nbconvert --execute analyze_dip.ipynb --to notebook
+        uv run ./dump.py
+        uv run jupyter nbconvert --execute analyze_dip.ipynb --to notebook
     - name: Archive webpage
       uses: actions/upload-artifact@v4
       with:
