@@ -53,7 +53,7 @@ function FilterWidget(props: FilterWidgetProps) {
         onChange={(_, newValue) => {
           setVal(newValue);
         }}
-        renderTags={(options) =>
+        renderValue={(options) =>
           options.map((option) => {
             return (
               <Chip
@@ -148,61 +148,24 @@ function KanbanBoard({gesetze, initiators, sachgebiete, keywords}: KanbanBoardPr
   const [gesetzeFilterInitiative, setGesetzeFilterInitiative] = useState<string[]>([])
   const [gesetzeFilterKeyword, setGesetzeFilterKeyword] = useState<string[]>([]);
 
-  const [filterTitleActive, setFilterTitleActive] = useState<boolean>(false);
-  const [filterSachgebietActive, setFilterSachgebietActive] = useState<boolean>(false);
-  const [filterInitiativeActive, setFilterInitiativeActive] = useState<boolean>(false);
-  const [filterKeywordActive, setFilterKeywordActive] = useState<boolean>(false);
-
-  const [gesetzeView, setGesetzeView] = useState<Gesetz[]>([])
-
-  const applyFilter = (sachegebiete: string[], initiators: string[], title: string, keywordsFilter: string[], sachgebietActive: boolean, initiatorsActive: boolean, titleActive: boolean, keywordsActive: boolean) => {
+  const gesetzeView = useMemo<Gesetz[]>(() => {
     let gesetze = gesetzeOpen;
-    if (titleActive) {
-      gesetze = gesetze.filter((it) => it.titel.indexOf(title) >= 0);
+    if (gesetzeFilterTitle.length > 0) {
+      gesetze = gesetze.filter((it) => it.titel.indexOf(gesetzeFilterTitle) >= 0);
     }
-    if (sachgebietActive) {
-      gesetze = gesetze.filter((it) => it.sachgebiet?.some((s) => sachegebiete.includes(s)))
+    if (gesetzeFilterSachgebiet.length > 0) {
+      gesetze = gesetze.filter((it) => it.sachgebiet?.some((s) => gesetzeFilterSachgebiet.includes(s)))
     }
-    if (initiatorsActive) {
-      gesetze = gesetze.filter((it) => it.initiative?.some((s) => initiators.includes(s)))
+    if (gesetzeFilterInitiative.length > 0) {
+      gesetze = gesetze.filter((it) => it.initiative?.some((s) => gesetzeFilterInitiative.includes(s)))
     }
-    if (keywordsActive) {
-      gesetze = gesetze.filter((it) => it.keywords?.some((s) => keywordsFilter.includes(s)))
+    if (gesetzeFilterKeyword.length > 0) {
+      gesetze = gesetze.filter((it) => it.keywords?.some((s) => gesetzeFilterKeyword.includes(s)))
     }
-    setGesetzeView(gesetze)
-  }
-
-  useEffect(() => {if (gesetzeView.length === 0) applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, gesetzeFilterKeyword, filterSachgebietActive, filterInitiativeActive, filterTitleActive, filterKeywordActive)})
+    return gesetze
+  }, [gesetzeOpen, gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, gesetzeFilterKeyword])
 
   const colSize = 400;
-
-  const handleFilterSachgebiet = (sachgebiete: string[]) => {
-    const sachgebietActive: boolean = sachgebiete.length > 0;
-    setFilterSachgebietActive(sachgebietActive);
-    setGesetzeFilterSachgebiet(sachgebiete)
-    applyFilter(sachgebiete, gesetzeFilterInitiative, gesetzeFilterTitle, gesetzeFilterKeyword, sachgebietActive, filterInitiativeActive, filterTitleActive, filterKeywordActive)
-  }
-
-  const handleFilterTitle = (title: string) => {
-    const titleActive: boolean = title.length > 0;
-    setFilterTitleActive(titleActive)
-    setGesetzeFilterTitle(title)
-    applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, title, gesetzeFilterKeyword, filterSachgebietActive, filterInitiativeActive, titleActive, filterKeywordActive)
-  }
-
-  const handleFilterInitiative = (initiators: string[]) => {
-    const initiatorsActive: boolean = initiators.length > 0
-    setFilterInitiativeActive(initiatorsActive);
-    setGesetzeFilterInitiative(initiators)
-    applyFilter(gesetzeFilterSachgebiet, initiators, gesetzeFilterTitle, gesetzeFilterKeyword, filterSachgebietActive, initiatorsActive, filterTitleActive, filterKeywordActive)
-  }
-
-  const handleFilterKeyword = (keywords: string[]) => {
-    const keywordsActive: boolean = keywords.length > 0
-    setFilterKeywordActive(keywordsActive);
-    setGesetzeFilterKeyword(keywords)
-    applyFilter(gesetzeFilterSachgebiet, gesetzeFilterInitiative, gesetzeFilterTitle, keywords, filterSachgebietActive, filterInitiativeActive, filterTitleActive, keywordsActive)
-  }
 
   return (
     <>
@@ -211,18 +174,18 @@ function KanbanBoard({gesetze, initiators, sachgebiete, keywords}: KanbanBoardPr
     <b>Filter</b>
     <Grid container spacing={2}>
       <Grid size={{xs:7}}>
-        <FilterWidget options={sachgebiete} callback={handleFilterSachgebiet} placeholder='Sachgebiet' />
+        <FilterWidget options={sachgebiete} callback={setGesetzeFilterSachgebiet} placeholder='Sachgebiet' />
       </Grid>
       <Grid size={{xs:5}}>
-        <FilterWidget options={initiators} callback={handleFilterInitiative} placeholder='Initiator' />
+        <FilterWidget options={initiators} callback={setGesetzeFilterInitiative} placeholder='Initiator' />
       </Grid>
     </Grid>
     <Grid container spacing={2}>
       <Grid size={{xs:7}}>
-        <FilterWidget options={keywords} callback={handleFilterKeyword} placeholder='Keywords' />
+        <FilterWidget options={keywords} callback={setGesetzeFilterKeyword} placeholder='Keywords' />
       </Grid>
       <Grid size={{xs:5}}>
-        <TextField fullWidth={true} id="standard-basic" label="Title" variant="standard" onChange={(e) => {handleFilterTitle(e.target.value)}} />
+        <TextField fullWidth={true} id="standard-basic" label="Title" variant="standard" onChange={(e) => {setGesetzeFilterTitle(e.target.value)}} />
       </Grid>
     </Grid>
     </Paper>

@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
       reactRefresh(),
     ],
     define: {
-      __BUILD_DATE__: new Date(),
+      __BUILD_DATE__: JSON.stringify(new Date()),
     },
     test: {
       globals: true,
