@@ -168,3 +168,6 @@ scripts/vorgang.json
 scripts/vorgangsposition.json
 web/public/gesetze.json
 web/public/tagesordnung.json
+
+# research data
+scripts/research/data/
